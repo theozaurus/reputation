@@ -31,7 +31,7 @@ class Reputation
     def value
       engine.rules.inject(0){|value, (name,rule)|
         b = behaviours[name]
-        value += b.metric * rule.normalized_weighting if b
+        value += rule.f(b.metric) * rule.normalized_weighting if b
         value
       }
     end

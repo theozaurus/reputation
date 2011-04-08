@@ -6,3 +6,7 @@ RSpec.configure do |config|
   config.expect_with :rspec
   config.mock_with   :rspec
 end
+
+Dir.glob('spec/helpers/*.rb') do |f|
+  require f
+end
