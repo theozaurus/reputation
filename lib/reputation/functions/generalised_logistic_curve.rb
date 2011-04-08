@@ -8,12 +8,12 @@ class Reputation
       
       def initialize(args = {})
         constants = { 
-          :a => 0,   # lower asymptote
+          :a => -1,  # lower asymptote
           :k => 1,   # upper asymptote
           :b => 10,  # growth rate
           :v => 0.5, # affects near which asymptote maximum growth occurs
           :q => 0.5, # depends on the value Y(0)
-          :m => 0.5, # the time of maximum growth if Q=v
+          :m => 0, # the time of maximum growth if Q=v
         }.merge( args )
         @a = constants[:a]
         @k = constants[:k]
@@ -24,17 +24,12 @@ class Reputation
       end
       
       def f(t)
-        r = a.to_f + (
-          (k.to_f - a.to_f) /
-          (1 + q.to_f * Math.exp(-1 * b.to_f*(t.to_f-m.to_f)) )**(1.to_f/v.to_f)
+        limit( 
+          a.to_f + (
+            (k.to_f - a.to_f) /
+            (1 + q.to_f * Math.exp(-1 * b.to_f*(t.to_f-m.to_f)) )**(1.to_f/v.to_f)
+          )
         )
-        if r > 1
-          1
-        elsif r < 0
-          0
-        else
-          r
-        end
       end
       
     end

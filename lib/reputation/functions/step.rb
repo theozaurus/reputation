@@ -4,15 +4,21 @@ class Reputation
       
       include Mixin
       
-      attr_accessor :c
+      attr_accessor :a, :k, :c
       
       def initialize(args = {})
-        constants = { :c => 0.5 }.merge( args )
+        constants = {
+          :a => -1,  # lower asymptote
+          :k => 1,   # upper asymptote
+          :c => 0.5  # point of switch
+        }.merge( args )
         @c = constants[:c]
+        @k = constants[:k]
+        @a = constants[:a]
       end
       
       def f(x)
-        x.to_f >= c.to_f ? 1 : 0
+        limit( x.to_f >= c.to_f ? k : a )
       end
       
     end

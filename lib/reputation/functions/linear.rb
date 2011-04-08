@@ -12,14 +12,7 @@ class Reputation
       end
       
       def f(x)
-        r = x * m
-        if r > 1
-          1
-        elsif r < 0
-          0
-        else
-          r
-        end
+        limit x * m
       end
       
     end
