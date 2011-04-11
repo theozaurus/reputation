@@ -20,6 +20,12 @@ class Reputation
       rules.inject(0){|t,(name,rule)| rule.weight + t }
     end
     
+    def value(behaviors)
+      rules.inject(0){|value,(name,rule)|
+        value += rule.value behaviors[name]
+      }
+    end
+    
   private
 
     def method_missing(name, *args, &block)
@@ -55,6 +61,10 @@ class Reputation
     # Look up total rule weighting, and provide normalised weighting
     def normalized_weighting
       BigDecimal(weight.to_s) / @engine.rules.total_weighting 
+    end
+    
+    def value(behavior)
+      behavior ? f(behavior.metric) * normalized_weighting : 0
     end
     
     # Delegate f to the function

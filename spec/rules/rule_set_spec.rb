@@ -3,7 +3,8 @@ require "spec_helper"
 describe Reputation::RuleSet do
   
   subject {
-    Reputation::RuleSet.new(Reputation.new)
+    @engine = Reputation.new
+    @engine.rules
   }
   
   describe "initializing" do
@@ -61,6 +62,19 @@ describe Reputation::RuleSet do
         }.to change {
           subject.total_weighting
         }.from(0).to(3.1)
+      end
+    end
+    
+    describe "value" do
+      it "should sum all of the values for each rule for array of behaviors" do
+        subject.add :rule_1, :weight => 1
+        subject.add :rule_2, :weight => 1
+        subject.add :rule_3, :weight => 1
+        
+        @engine.users['bob'].behaviours.add :rule_1, 1.0
+        @engine.users['bob'].behaviours.add :rule_2, -0.25
+        
+        subject.value(@engine.users['bob'].behaviours).should == (1/3.0 - 0.25/3.0)
       end
     end
         

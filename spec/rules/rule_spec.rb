@@ -84,6 +84,32 @@ describe Reputation::Rule do
       end
     end
     
+    describe "value" do
+      it "should return 0 if nil is passed in" do
+        subject.value(nil).should equal 0
+      end
+      
+      it "should return the value based on the metric considering the normalised weighting" do
+        behavior = @engine.users['bob'].behaviours.add :name, 0.5
+        
+        expect {
+          @engine.rules.add :other, :weight => 1
+        }.to change {
+          subject.value(behavior)
+        }.from(0.5).to(0.25)
+      end
+      
+      it "should return the value based on the metric considering the squashing function" do
+        behavior = @engine.users['bob'].behaviours.add :name, 0.5
+        
+        expect {
+          subject.function = Reputation::Functions::Linear.new :m => 2
+        }.to change {
+          subject.value(behavior)          
+        }.from(0.5).to(1.0)
+      end
+    end
+    
     describe "weight=" do
       it "should change the weight" do
         subject.weight = 5
