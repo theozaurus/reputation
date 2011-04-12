@@ -74,7 +74,7 @@ describe Reputation::RuleSet do
         @engine.users['bob'].behaviours.add :rule_1, 1.0
         @engine.users['bob'].behaviours.add :rule_2, -0.25
         
-        subject.value(@engine.users['bob'].behaviours).should == (1/3.0 - 0.25/3.0)
+        subject.value('bob').should == (1/3.0 - 0.25/3.0)
       end
     end
         

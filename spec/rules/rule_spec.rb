@@ -95,17 +95,17 @@ describe Reputation::Rule do
         expect {
           @engine.rules.add :other, :weight => 1
         }.to change {
-          subject.value(behavior)
+          subject.value('bob')
         }.from(0.5).to(0.25)
       end
       
       it "should return the value based on the metric considering the squashing function" do
-        behavior = @engine.users['bob'].behaviours.add :name, 0.5
+        @engine.users['bob'].behaviours.add :name, 0.5
         
         expect {
           subject.function = Reputation::Functions::Linear.new :m => 2
         }.to change {
-          subject.value(behavior)          
+          subject.value('bob')
         }.from(0.5).to(1.0)
       end
     end

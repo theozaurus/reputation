@@ -29,7 +29,7 @@ class Reputation
     end
     
     def value
-      engine.rules.value(behaviours)
+      engine.rules.value(name)
     end
     
     def behaviours

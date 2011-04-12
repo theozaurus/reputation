@@ -20,9 +20,9 @@ class Reputation
       rules.inject(0){|t,(name,rule)| rule.weight + t }
     end
     
-    def value(behaviors)
+    def value(user)
       rules.inject(0){|value,(name,rule)|
-        value += rule.value behaviors[name]
+        value += rule.value user
       }
     end
     
@@ -63,8 +63,9 @@ class Reputation
       BigDecimal(weight.to_s) / @engine.rules.total_weighting 
     end
     
-    def value(behavior)
-      behavior ? f(behavior.metric) * normalized_weighting : 0
+    def value(user)
+      behaviour = @engine.users[user].behaviours[name]
+      behaviour ? f(behaviour.metric) * normalized_weighting : 0
     end
     
     # Delegate f to the function
