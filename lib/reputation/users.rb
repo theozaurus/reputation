@@ -33,7 +33,7 @@ class Reputation
     end
     
     def behaviours
-      @behaviours ||= BehaviourSet.new
+      @behaviours ||= BehaviourSet.new @name, @engine
     end
     
   private

@@ -27,12 +27,20 @@ describe Reputation::Rule do
         :function  => :generalised_logistic_curve,
         :constants => {
           :b => 2
+        },
+        :aggregate_function  => :step,
+        :aggregate_constants => {
+          :c => 20
         }
       })
       
       r.weight.should == 4
       r.function.should be_a Reputation::Functions::GeneralisedLogisticCurve
       r.function.b.should == 2
+      
+      r.weight.should == 4
+      r.aggregate_function.should be_a Reputation::Functions::Step
+      r.aggregate_function.c.should == 20
     end
     
   end
@@ -54,6 +62,19 @@ describe Reputation::Rule do
       end
     end
     
+    describe "aggregate_function" do
+      it "should return the aggregate function" do
+        Reputation::Rule.new(:rule_name, Reputation.new, :aggregate_function => :step).aggregate_function.should be_a Reputation::Functions::Step
+      end
+    end
+    
+    describe "aggregate_function=" do
+      it "should set the aggregate function" do
+        subject.aggregate_function = Reputation::Functions::Linear.new
+        subject.aggregate_function.should be_a Reputation::Functions::Linear
+      end
+    end
+    
     describe "normalized_weighting" do
       it "should be 1 if there are no other rules" do
         subject.weight = 200
@@ -61,7 +82,13 @@ describe Reputation::Rule do
       end
       
       it "should calculate the normalized weighting if there are other rules" do
+        @engine.rules.add :foo, :weight => 1
         
+        subject.normalized_weighting.should eql 1/2.0
+        
+        @engine.rules.add :bar, :weight => 2
+        
+        subject.normalized_weighting.should eql 1/4.0
       end
     end
     
@@ -85,29 +112,91 @@ describe Reputation::Rule do
     end
     
     describe "value" do
-      it "should return 0 if nil is passed in" do
-        subject.value(nil).should equal 0
+      
+      describe "when kind is singular" do
+        
+        subject {
+          @engine.rules.add :name, :weight => 1, :kind => :singular
+          @engine.rules[:name]
+        }
+        
+        it "should return 0 if nil is passed in" do
+          subject.value(nil).should equal 0
+        end
+
+        it "should return the value based on the metric considering the normalised weighting" do
+          @engine.rules.add :name
+          behavior = @engine.users['bob'].behaviours.add :name, 0.5
+
+          expect {
+            @engine.rules.add :other, :weight => 1
+          }.to change {
+            subject.value('bob')
+          }.from(0.5).to(0.25)
+        end
+
+        it "should return the value based on the metric considering the squashing function" do
+          @engine.rules.add :name
+          @engine.users['bob'].behaviours.add :name, 0.5
+
+          expect {
+            subject.function = Reputation::Functions::Linear.new :m => 2
+          }.to change {
+            subject.value('bob')
+          }.from(0.5).to(1.0)
+        end
       end
       
-      it "should return the value based on the metric considering the normalised weighting" do
-        behavior = @engine.users['bob'].behaviours.add :name, 0.5
+      describe "when kind is collection" do
+        subject {
+          @engine.rules.add :name, :weight => 1,
+                                   :kind => :collection,
+                                   :function  => :linear,
+                                   :constants => { :m => 1 },
+                                   :aggregate_function  => :linear,
+                                   :aggregate_constants => { :m => 0.1 }
+          @engine.rules[:name]
+        }
         
-        expect {
-          @engine.rules.add :other, :weight => 1
-        }.to change {
-          subject.value('bob')
-        }.from(0.5).to(0.25)
-      end
-      
-      it "should return the value based on the metric considering the squashing function" do
-        @engine.users['bob'].behaviours.add :name, 0.5
+        it "should return 0 if nil is passed in" do
+          subject.value(nil).should equal 0
+        end
         
-        expect {
-          subject.function = Reputation::Functions::Linear.new :m => 2
-        }.to change {
-          subject.value('bob')
-        }.from(0.5).to(1.0)
+        it "should return the value based on the metric considering the normalised weighting" do
+          @engine.rules.add :name
+          behavior = @engine.users['bob'].behaviours.add :name, 0.5
+
+          expect {
+            @engine.rules.add :other, :weight => 1
+          }.to change {
+            subject.value('bob')
+          }.from(0.05).to(0.025)
+        end
+        
+        it "should return the value based on the metric considering the squashing function" do
+          @engine.rules.add :name
+          @engine.users['bob'].behaviours.add :name, 0.5
+
+          expect {
+            subject.function = Reputation::Functions::Linear.new :m => 2
+          }.to change {
+            subject.value('bob')
+          }.from(0.05).to(0.1)
+        end
+        
+        it "should return the value based on previous metrics" do
+          @engine.rules.add :name
+          @engine.users['bob'].behaviours.add :name, 0.5
+
+          expect {
+            @engine.users['bob'].behaviours.add :name, 0.5
+          }.to change {
+            subject.value('bob')
+          }.from(0.05).to(0.10)
+        end
+        
       end
+
     end
     
     describe "weight=" do

@@ -41,20 +41,23 @@ class Reputation
   class Rule
     
     attr_reader :name, :kind
-    attr_accessor :weight, :function
+    attr_accessor :weight, :function, :aggregate_function
     
     def initialize(name, engine, args={})
       options = {
         :weight    => 1,
         :kind      => :singular,
         :function  => :linear,
-        :constants => { :m => 1 }
+        :constants => { :m => 1 },
+        :aggregate_function => :linear,
+        :aggregate_constants => { :m => 1 }
       }.merge(args)
       
       @name     = name.to_sym
       @weight   = options[:weight]
       @kind     = options[:kind]
       @function = build_function(options[:function], options[:constants])
+      @aggregate_function = build_function(options[:aggregate_function], options[:aggregate_constants])
       @engine = engine
     end
     
@@ -64,16 +67,52 @@ class Reputation
     end
     
     def value(user)
-      behaviour = @engine.users[user].behaviours[name]
-      behaviour ? f(behaviour.metric) * normalized_weighting : 0
+      behaviour = behaviour_for user
+      if behaviour
+        case kind
+        when :singular
+          f(behaviour.metric) * normalized_weighting
+        when :collection
+          aggregate_f( 
+            f(behaviour.metric) + intermediate_values_for(user)[:collection]
+          ) * normalized_weighting
+        end
+      else
+        0
+      end
     end
     
-    # Delegate f to the function
-    def f(*args)
-      function.f(*args)
+    def before_new_behaviour_for(user)
+      behaviour = behaviour_for user
+      case kind
+      when :collection
+        intermediate_values_for(user)[:collection] += f(behaviour.metric) if behaviour
+      end
     end
     
   private
+  
+    # Delegate f to the function#f
+    def f(*args)
+      function.f(*args)
+    end
+  
+    # Delegate aggregate_f to the aggregate_function#f
+    def aggregate_f(*args)
+      aggregate_function.f(*args)
+    end
+  
+    def intermediate_values_for(user)
+      (@intermediate_values ||= {})[user] ||= begin
+        hash = {}
+        hash.default = 0
+        hash
+      end
+    end
+    
+    def behaviour_for(user)
+      @engine.users[user].behaviours[name]
+    end
   
     def build_function(name, constants)
       # Mimic a bit of active support to turn :generalised_logistic_curve into
