@@ -40,20 +40,20 @@ class Reputation
   
   class Rule
     
-    attr_reader :name, :type
+    attr_reader :name, :kind
     attr_accessor :weight, :function
     
     def initialize(name, engine, args={})
       options = {
         :weight    => 1,
-        :type      => :singular,
+        :kind      => :singular,
         :function  => :linear,
         :constants => { :m => 1 }
       }.merge(args)
       
       @name     = name.to_sym
       @weight   = options[:weight]
-      @type     = options[:type]
+      @kind     = options[:kind]
       @function = build_function(options[:function], options[:constants])
       @engine = engine
     end

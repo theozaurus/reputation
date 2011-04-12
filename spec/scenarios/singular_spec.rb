@@ -5,8 +5,8 @@ describe "User updating a profile by" do
   before do
     @reputation = Reputation.new
     # Two equally weighted rules
-    @reputation.rules.add :misc,           :weighting => 1, :type => :singular
-    @reputation.rules.add :profile_update, :weighting => 1, :type => :singular
+    @reputation.rules.add :misc,           :weighting => 1, :kind => :singular
+    @reputation.rules.add :profile_update, :weighting => 1, :kind => :singular
   end
   
   describe "adding content" do

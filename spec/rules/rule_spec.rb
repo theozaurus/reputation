@@ -37,7 +37,7 @@ describe Reputation::Rule do
     
   end
   
-  it_should_not_have_methods :name=, :type=
+  it_should_not_have_methods :name=, :kind=
   
   describe "instance method" do
     
@@ -78,9 +78,9 @@ describe Reputation::Rule do
       end
     end
     
-    describe "type" do
+    describe "kind" do
       it "should return the name of the rule as a symbol" do
-        Reputation::Rule.new(:rule_name, Reputation.new, :type => :singular).type.should eql :singular
+        Reputation::Rule.new(:rule_name, Reputation.new, :kind => :singular).kind.should eql :singular
       end
     end
     
