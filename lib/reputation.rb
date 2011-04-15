@@ -1,5 +1,2 @@
-require 'reputation/reputation'
-require 'reputation/users'
-require 'reputation/rules'
-require 'reputation/behaviours'
+require 'reputation/user'
 require 'reputation/functions'

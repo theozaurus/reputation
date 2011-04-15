@@ -32,17 +32,17 @@ describe Reputation::Functions::GeneralisedLogisticCurve do
           :m => 15
         )
                 
-        function_1.f(0).should be_within(0.05).of(0.23)
-        function_2.f(0).should be_within(0.05).of(0)
-        function_3.f(0).should be_within(0.05).of(0)
+        function_1.f(0).should be_close(0.23, 0.05)
+        function_2.f(0).should be_close(0, 0.05)
+        function_3.f(0).should be_close(0, 0.05)
         
-        function_1.f(5).should be_within(0.05).of(0.99)
-        function_2.f(5).should be_within(0.05).of(0)
-        function_3.f(5).should be_within(0.05).of(0)
+        function_1.f(5).should be_close(0.99, 0.05)
+        function_2.f(5).should be_close(0, 0.05)
+        function_3.f(5).should be_close(0, 0.05)
         
-        function_1.f(20).should be_within(0.05).of(1)
-        function_2.f(20).should be_within(0.05).of(0.66)
-        function_3.f(20).should be_within(0.05).of(0.96)
+        function_1.f(20).should be_close(1, 0.05)
+        function_2.f(20).should be_close(0.66, 0.05)
+        function_3.f(20).should be_close(0.96, 0.05)
       end
     end
   end

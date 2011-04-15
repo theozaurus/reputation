@@ -5,6 +5,8 @@ class Reputation
   class Functions
     module Mixin
       
+      # Produces the URL for a google chart of the function
+      #
       def google_chart_url
         points = 1000
         range = Array.new(points){|i| (i-points/2) * 0.01 }
@@ -18,6 +20,8 @@ class Reputation
         )
       end
       
+      # Opens the google chart for the function in the browser
+      #
       def google_chart
         Launchy::Browser.run google_chart_url
       end

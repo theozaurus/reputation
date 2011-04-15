@@ -1,10 +1,13 @@
-$:.unshift File.join(File.dirname(File.dirname(__FILE__)),'lib')
+ENV["RAILS_ENV"] = "test"
+require File.expand_path(File.dirname(__FILE__) + "/rails_root/config/environment")
+
+$:.unshift File.expand_path(File.dirname(File.dirname(__FILE__)))
 
 require 'reputation'
-
-RSpec.configure do |config|
-  config.expect_with :rspec
-  config.mock_with   :rspec
+require 'shoulda'
+require 'spec/rails'
+Spec::Runner.configure do |config|
+  # config
 end
 
 Dir.glob('spec/helpers/*.rb') do |f|

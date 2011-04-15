@@ -12,10 +12,14 @@ Gem::Specification.new do |s|
   
   s.add_dependency 'googlecharts'
   s.add_dependency 'launchy'
+  s.add_development_dependency 'sqlite3'
   s.add_development_dependency 'rake'
-  s.add_development_dependency 'rspec', '~> 2.4'
+  s.add_development_dependency 'rspec'
+  s.add_development_dependency 'rspec-rails', '~> 1.3'
+  s.add_development_dependency 'shoulda'
+  s.add_development_dependency 'rails', '2.3.11'
   
-  s.files        = Dir.glob("lib/**/*") + %w()
-  s.test_files   = Dir.glob("spec/**/*") + %w(.rspec .infinity_test)
+  s.files        = Dir.glob("{lib,app,generators,rails}/**/*")
+  s.test_files   = Dir.glob("{spec}/**/*") + %w(.rspec .infinity_test)
   s.require_path = 'lib'
 end
