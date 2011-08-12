@@ -14,17 +14,17 @@ class ReputationRule < ActiveRecord::Base
   
   attr_readonly :kind
   
-  def initialize(args = {})
-    options = {
+  def initialize(*args)
+    args[0] = {
       :weight => 1,
       :kind => 'singular',
       :function => 'linear',
       :constants => { :m => 1 },
       :aggregate_function => 'linear',
       :aggregate_constants => { :m => 1 }
-    }.merge(args)
+    }.merge(args.first||{})
 
-    super options
+    super *args
   end
   
   # Return the total score for a certain user
