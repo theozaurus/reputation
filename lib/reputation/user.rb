@@ -31,10 +31,10 @@ class Reputation
     module AddRails3
       def add(rule, metric)
         rule = ReputationRule.find_by_name rule unless rule.is_a? ReputationRule
-        b = reflection.klass.find_by_user_id_and_rule_id owner.id, rule.id
-        b ||= reflection.klass.new :rule => rule, :user => owner
+        b = proxy_association.reflection.klass.find_by_user_id_and_rule_id proxy_association.owner.id, rule.id
+        b ||= proxy_association.reflection.klass.new :rule => rule, :user => proxy_association.owner
         b.update_attribute :metric, metric
-        owner.behaviours(true)
+        proxy_association.owner.behaviours(true)
         b
       end
     end
