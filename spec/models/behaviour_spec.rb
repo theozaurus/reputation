@@ -28,4 +28,8 @@ describe ReputationBehaviour do
     ReputationBehaviour.create!(:user => User.create!, :rule => @rule, :metric => 0).rule.should eql @rule
   end
   
+  it "should be possible to recalculate a rule without raising an ArgumentError in Rails 3.1" do
+    expect { @user.behaviours.first.send :recalculate_rule }.should_not raise_error(ArgumentError) 
+  end
+  
 end

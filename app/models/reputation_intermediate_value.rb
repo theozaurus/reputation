@@ -11,12 +11,13 @@ class ReputationIntermediateValue < ActiveRecord::Base
   
   attr_accessible :user, :rule, :name, :value
   
-  def initialize(args = {})
-    options = {
+  def initialize(*args)
+    args[0] = {
       :value => 0
-    }.merge(args)
+    }.merge(args.first || {})
 
-    super options
+    super *args
   end
+
     
 end
